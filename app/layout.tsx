@@ -10,6 +10,9 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: "Theia | Auditions 2k26",
   description: "Step into the spotlight. Showcase your craft in photography, filmmaking, cinematography, and digital arts with Theia.",
+  openGraph: {
+    images: ["/hero.jpeg"],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
