@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+html {
+  scroll-behavior: smooth;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -8,8 +12,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-montserrat);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,4 +26,245 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.social-pill {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.75rem;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: rgba(229, 229, 229, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: color 0.35s ease, border-color 0.35s ease;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* The sliding white fill */
+.social-pill::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #ffffff;
+  border-radius: inherit;
+  transform: translateX(-101%);
+  transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 0;
+}
+
+.social-pill:hover::before {
+  transform: translateX(0);
+}
+
+.social-pill:hover {
+  color: #000000;
+  border-color: #ffffff;
+}
+
+/* Ensure SVG inside also inherits the color change */
+.social-pill svg {
+  transition: color 0.35s ease;
+}
+
+/* ── Registration form utilities ────────────────────────── */
+
+.form-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(163, 163, 163, 1);
+}
+
+.form-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  padding: 0.8rem 1rem;
+  font-size: 0.875rem;
+  color: #ffffff;
+  outline: none;
+  transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+  font-family: inherit;
+}
+
+.form-input::placeholder {
+  color: rgba(115, 115, 115, 0.8);
+}
+
+.form-input:focus {
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
+}
+
+.form-input option {
+  background: #111111;
+  color: #ffffff;
+}
+
+.form-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  width: 100%;
+  padding: 1rem 2rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  position: relative;
+  overflow: hidden;
+  background: #ffffff;
+  color: #000000;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 36px rgba(255, 255, 255, 0.15);
+}
+
+.form-submit:active {
+  transform: translateY(0);
+}
+
+.glass-circle {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.3s ease;
+}
+.glass-circle:hover {
+  background: rgba(255, 255, 255, 0.35);
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: scale(1.08);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.25);
+}
+.cinematic-glow {
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.45);
+}
+
+@keyframes scroll-bounce {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  40% {
+    transform: translateY(6px);
+    opacity: 0.5;
+  }
+  70% {
+    transform: translateY(3px);
+    opacity: 0.8;
+  }
+}
+
+@theme inline {
+  --animate-scroll-bounce: scroll-bounce 1.6s ease-in-out infinite;
+}
+
+.animate-scroll-bounce {
+  animation: var(--animate-scroll-bounce);
+}
+
+/* ── Interest icon hover animations ────────────────────────── */
+
+/* 1. Photography — shutter click: snap compress + bounce back */
+@keyframes shutter {
+  0%   { transform: scale(1); }
+  20%  { transform: scale(0.7) rotate(-5deg); }
+  50%  { transform: scale(1.15) rotate(3deg); }
+  75%  { transform: scale(0.95); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+.anim-shutter {
+  display: inline-flex;
+  transform-origin: center;
+}
+.group:hover .anim-shutter {
+  animation: shutter 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards;
+}
+
+/* 2. Videography — clapperboard slam: flick up then snap down */
+@keyframes clap {
+  0%   { transform: rotate(0deg); }
+  20%  { transform: rotate(-25deg) translateY(-3px); }
+  45%  { transform: rotate(8deg); }
+  65%  { transform: rotate(-5deg); }
+  100% { transform: rotate(0deg); }
+}
+.anim-clap {
+  display: inline-flex;
+  transform-origin: bottom center;
+}
+.group:hover .anim-clap {
+  animation: clap 0.5s ease-in-out forwards;
+}
+
+/* 3. Editing — timeline scrub: rapid left-right jitter */
+@keyframes scrub {
+  0%   { transform: translateX(0); }
+  15%  { transform: translateX(-5px); }
+  30%  { transform: translateX(5px); }
+  45%  { transform: translateX(-4px); }
+  60%  { transform: translateX(4px); }
+  75%  { transform: translateX(-2px); }
+  90%  { transform: translateX(2px); }
+  100% { transform: translateX(0); }
+}
+.anim-scrub {
+  display: inline-flex;
+}
+.group:hover .anim-scrub {
+  animation: scrub 0.55s ease-in-out forwards;
+}
+
+/* 4. Graphic design — pen tool draw: smooth 360° spin */
+@keyframes draw {
+  0%   { transform: rotate(0deg) scale(1); }
+  50%  { transform: rotate(180deg) scale(1.15); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+.anim-draw {
+  display: inline-flex;
+  transform-origin: center;
+}
+.group:hover .anim-draw {
+  animation: draw 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* 5. Social media — megaphone ring: side-to-side broadcast shake */
+@keyframes ring {
+  0%   { transform: rotate(0deg) scale(1); }
+  10%  { transform: rotate(-15deg) scale(1.1); }
+  25%  { transform: rotate(15deg) scale(1.15); }
+  40%  { transform: rotate(-12deg) scale(1.1); }
+  55%  { transform: rotate(12deg) scale(1.08); }
+  70%  { transform: rotate(-6deg) scale(1.04); }
+  85%  { transform: rotate(6deg) scale(1.02); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+.anim-ring {
+  display: inline-flex;
+  transform-origin: bottom left;
+}
+.group:hover .anim-ring {
+  animation: ring 0.65s ease-in-out forwards;
 }
