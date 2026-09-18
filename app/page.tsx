@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
-import { Clapperboard, PenTool, Megaphone, Plus, X, Link2 } from "lucide-react";
+import { Clapperboard, PenTool, Megaphone, Plus, X, Link2, Phone } from "lucide-react";
 
 const INTERESTS = [
   {
@@ -71,26 +71,68 @@ export default function Home() {
   const [formData, setFormData] = useState({
     name: "",
     enrollment: "",
+    phone: "",
+    instaHandle: "",
     interest: "",
   });
   const [portfolioLinks, setPortfolioLinks] = useState<string[]>([""]);
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Validation errors
+  const [errors, setErrors] = useState<Record<string, string>>({})
+
+  const validate = () => {
+    const e: Record<string, string> = {};
+    if (!formData.name.trim()) e.name = "Full name is required.";
+    if (!formData.enrollment.trim()) e.enrollment = "Enrollment number is required.";
+    if (!formData.phone.trim()) {
+      e.phone = "Phone number is required.";
+    } else if (!/^[6-9][0-9]{9}$/.test(formData.phone)) {
+      e.phone = "Enter a valid 10-digit Indian mobile number.";
+    }
+    if (!formData.instaHandle.trim()) e.instaHandle = "Instagram handle is required.";
+    if (!formData.interest) e.interest = "Please select your primary interest.";
+    if (!portfolioLinks.some((l) => l.trim() !== ""))
+      e.portfolio = "Add at least one portfolio link.";
+    return e;
+  };
+
+  const clearError = (field: string) =>
+    setErrors((prev) => { const n = { ...prev }; delete n[field]; return n; });
+
   const addLink = () => setPortfolioLinks((prev) => [...prev, ""]);
   const removeLink = (i: number) =>
     setPortfolioLinks((prev) => prev.filter((_, idx) => idx !== i));
-  const updateLink = (i: number, val: string) =>
+  const updateLink = (i: number, val: string) => {
     setPortfolioLinks((prev) => prev.map((l, idx) => (idx === i ? val : l)));
+    if (val.trim()) clearError("portfolio");
+  };
 
   const handleInterestClick = (id: number, name: string) => {
     setActivePill(id);
     setFormData((prev) => ({ ...prev, interest: name }));
+    clearError("interest");
     document.getElementById("register")?.scrollIntoView({ behavior: "smooth" });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      // Scroll to first error
+      const firstKey = Object.keys(validationErrors)[0];
+      const idMap: Record<string, string> = {
+        name: "reg-name", enrollment: "reg-enrollment",
+        phone: "reg-phone", instaHandle: "reg-insta",
+        interest: "reg-interest", portfolio: "reg-portfolio",
+      };
+      document.getElementById(idMap[firstKey] || "reg-name")?.focus();
+      return;
+    }
+    setErrors({});
     setIsSubmitting(true);
     
     // Grab the URL from the .env.local file
@@ -99,6 +141,8 @@ export default function Home() {
     const data = new FormData();
     data.append("name", formData.name);
     data.append("enrollment", formData.enrollment);
+    data.append("phone", "+91" + formData.phone);
+    data.append("instaHandle", formData.instaHandle ? "@" + formData.instaHandle.replace(/^@/, "") : "");
     data.append("interest", formData.interest);
     data.append("portfolioLinks", portfolioLinks.filter(l => l.trim() !== "").join(", "));
 
@@ -304,7 +348,7 @@ export default function Home() {
               </p>
               <button
                 className="mt-4 text-sm text-neutral-500 underline underline-offset-4 hover:text-white transition-colors"
-                onClick={() => { setSubmitted(false); setFormData({ name: "", enrollment: "", interest: "" }); setPortfolioLinks([""]); }}
+                onClick={() => { setSubmitted(false); setFormData({ name: "", enrollment: "", phone: "", instaHandle: "", interest: "" }); setPortfolioLinks([""]); setErrors({}); }}
               >
                 Submit another response
               </button>
@@ -322,11 +366,12 @@ export default function Home() {
                     id="reg-name"
                     required
                     type="text"
-                    className="form-input"
+                    className={`form-input ${errors.name ? "border-red-500/60 focus:border-red-500" : ""}`}
                     placeholder="e.g. Anuj Divedi"
                     value={formData.name}
-                    onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
+                    onChange={(e) => { setFormData((p) => ({ ...p, name: e.target.value })); clearError("name"); }}
                   />
+                  {errors.name && <p className="text-xs text-red-400 mt-0.5">{errors.name}</p>}
                 </div>
 
                 {/* Enrollment Number */}
@@ -338,15 +383,77 @@ export default function Home() {
                     id="reg-enrollment"
                     required
                     type="text"
-                    className="form-input"
+                    className={`form-input ${errors.enrollment ? "border-red-500/60 focus:border-red-500" : ""}`}
                     placeholder="e.g. 2024CSE1042"
                     value={formData.enrollment}
-                    onChange={(e) => setFormData((p) => ({ ...p, enrollment: e.target.value }))}
+                    onChange={(e) => { setFormData((p) => ({ ...p, enrollment: e.target.value })); clearError("enrollment"); }}
                   />
+                  {errors.enrollment && <p className="text-xs text-red-400 mt-0.5">{errors.enrollment}</p>}
                 </div>
               </div>
 
-              {/* Row 2: Interest dropdown */}
+              {/* Row 2: Phone + Instagram Handle */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                {/* Phone Number */}
+                <div className="flex flex-col gap-2">
+                  <label className="form-label" htmlFor="reg-phone">
+                    Phone Number <span className="text-neutral-500">*</span>
+                  </label>
+                  <div className={`flex items-stretch bg-white/[0.04] border rounded-lg overflow-hidden transition-colors focus-within:bg-white/[0.07] ${errors.phone ? "border-red-500/60 focus-within:border-red-500" : "border-white/10 focus-within:border-white/35"}`}>
+                    <span className="flex items-center gap-1.5 px-3 border-r border-white/10 shrink-0 text-neutral-400 text-sm select-none">
+                      <Phone className="w-4 h-4 text-neutral-500" />
+                      +91
+                    </span>
+                    <input
+                      id="reg-phone"
+                      required
+                      type="tel"
+                      inputMode="numeric"
+                      maxLength={10}
+                      pattern="[6-9][0-9]{9}"
+                      className="flex-1 bg-transparent outline-none px-3 py-[0.8rem] text-sm text-white placeholder:text-neutral-600 min-w-0"
+                      placeholder="9876543210"
+                      value={formData.phone}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/\D/g, "").slice(0, 10);
+                        setFormData((p) => ({ ...p, phone: val }));
+                        clearError("phone");
+                      }}
+                    />
+                  </div>
+                  {errors.phone && <p className="text-xs text-red-400 mt-0.5">{errors.phone}</p>}
+                </div>
+
+                {/* Instagram Handle */}
+                <div className="flex flex-col gap-2">
+                  <label className="form-label" htmlFor="reg-insta">
+                    Instagram Handle <span className="text-neutral-500">*</span>
+                  </label>
+                  <div className={`flex items-stretch bg-white/[0.04] border rounded-lg overflow-hidden transition-colors focus-within:bg-white/[0.07] ${errors.instaHandle ? "border-red-500/60 focus-within:border-red-500" : "border-white/10 focus-within:border-white/35"}`}>
+                    <span className="flex items-center justify-center px-3 border-r border-white/10 shrink-0">
+                      <svg className="w-4 h-4 text-neutral-500" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069M12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z" />
+                      </svg>
+                    </span>
+                    <input
+                      id="reg-insta"
+                      required
+                      type="text"
+                      className="flex-1 bg-transparent outline-none px-3 py-[0.8rem] text-sm text-white placeholder:text-neutral-600 min-w-0"
+                      placeholder="your_handle (without @)"
+                      value={formData.instaHandle}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/^@/, "");
+                        setFormData((p) => ({ ...p, instaHandle: val }));
+                        clearError("instaHandle");
+                      }}
+                    />
+                  </div>
+                  {errors.instaHandle && <p className="text-xs text-red-400 mt-0.5">{errors.instaHandle}</p>}
+                </div>
+              </div>
+
+              {/* Row 3: Interest dropdown */}
               <div className="flex flex-col gap-2">
                 <label className="form-label" htmlFor="reg-interest">
                   Primary Craft / Interest <span className="text-neutral-500">*</span>
@@ -355,9 +462,9 @@ export default function Home() {
                   <select
                     id="reg-interest"
                     required
-                    className="form-input appearance-none pr-10 cursor-pointer"
+                    className={`form-input appearance-none pr-10 cursor-pointer ${errors.interest ? "border-red-500/60 focus:border-red-500" : ""}`}
                     value={formData.interest}
-                    onChange={(e) => setFormData((p) => ({ ...p, interest: e.target.value }))}
+                    onChange={(e) => { setFormData((p) => ({ ...p, interest: e.target.value })); clearError("interest"); }}
                   >
                     <option value="" disabled>Select your primary craft...</option>
                     {INTERESTS.map((i) => (
@@ -375,12 +482,13 @@ export default function Home() {
                     <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </div>
+                {errors.interest && <p className="text-xs text-red-400 mt-0.5">{errors.interest}</p>}
               </div>
 
-              {/* Row 3: Portfolio Links */}
+              {/* Row 4: Portfolio Links */}
               <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between">
-                  <label className="form-label">
+                  <label className="form-label" id="reg-portfolio">
                     Prior Work / Portfolio Links <span className="text-neutral-500">*</span>
                   </label>
                   <button
@@ -396,7 +504,7 @@ export default function Home() {
                 <div className="flex flex-col gap-3">
                   {portfolioLinks.map((link, i) => (
                     <div key={i} className="flex items-center gap-2">
-                      <div className="flex items-stretch flex-1 bg-white/[0.04] border border-white/10 rounded-lg overflow-hidden transition-colors focus-within:border-white/35 focus-within:bg-white/[0.07]">
+                      <div className={`flex items-stretch flex-1 bg-white/[0.04] border rounded-lg overflow-hidden transition-colors focus-within:bg-white/[0.07] ${errors.portfolio && !portfolioLinks.some(l => l.trim()) ? "border-red-500/60 focus-within:border-red-500" : "border-white/10 focus-within:border-white/35"}`}>
                         <span className="flex items-center justify-center px-3 border-r border-white/10 shrink-0">
                           <Link2 className="w-4 h-4 text-neutral-500" />
                         </span>
@@ -421,6 +529,7 @@ export default function Home() {
                     </div>
                   ))}
                 </div>
+                {errors.portfolio && <p className="text-xs text-red-400 mt-0.5">{errors.portfolio}</p>}
               </div>
 
               {/* Submit */}
