@@ -6,7 +6,7 @@ import { Clapperboard, PenTool, Megaphone, Plus, X, Link2, Phone } from "lucide-
 const INTERESTS = [
   {
     id: 1,
-    name: "Photography",
+    name: "Photographer",
     animClass: "anim-shutter",
     icon: (
       <svg
@@ -26,7 +26,7 @@ const INTERESTS = [
   },
   {
     id: 2,
-    name: "Videography",
+    name: "Videographer",
     animClass: "anim-clap",
     icon: <Clapperboard className="w-6 h-6 sm:w-7 sm:h-7 text-neutral-300 group-hover:text-white transition-colors" strokeWidth={1.5} />,
   },
@@ -58,7 +58,7 @@ const INTERESTS = [
   },
   {
     id: 5,
-    name: "Social media",
+    name: "Content Creation",
     animClass: "anim-ring",
     icon: <Megaphone className="w-6 h-6 sm:w-7 sm:h-7 text-neutral-300 group-hover:text-white transition-colors" strokeWidth={1.5} />,
   },
