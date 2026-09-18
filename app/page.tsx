@@ -6,7 +6,7 @@ import { Clapperboard, PenTool, Megaphone, Plus, X, Link2, Phone } from "lucide-
 const INTERESTS = [
   {
     id: 1,
-    name: "Photographer",
+    name: "Photography",
     animClass: "anim-shutter",
     icon: (
       <svg
@@ -26,7 +26,7 @@ const INTERESTS = [
   },
   {
     id: 2,
-    name: "Videographer",
+    name: "Videography",
     animClass: "anim-clap",
     icon: <Clapperboard className="w-6 h-6 sm:w-7 sm:h-7 text-neutral-300 group-hover:text-white transition-colors" strokeWidth={1.5} />,
   },
@@ -58,7 +58,7 @@ const INTERESTS = [
   },
   {
     id: 5,
-    name: "Content Creation",
+    name: "Social media",
     animClass: "anim-ring",
     icon: <Megaphone className="w-6 h-6 sm:w-7 sm:h-7 text-neutral-300 group-hover:text-white transition-colors" strokeWidth={1.5} />,
   },
@@ -134,7 +134,7 @@ export default function Home() {
     }
     setErrors({});
     setIsSubmitting(true);
-    
+
     // Grab the URL from the .env.local file
     const SCRIPT_URL = process.env.NEXT_PUBLIC_GOOGLE_SHEETS_WEBHOOK_URL || "";
 
@@ -234,7 +234,7 @@ export default function Home() {
 
           {/* ── MOBILE ONLY: Centred CTA ───────────────────────── */}
           {/* On desktop this is hidden; the CTA lives in the footer row */}
-          <div className="flex md:hidden flex-col items-center text-center flex-1 justify-center gap-3 -mt-8">
+          <div className="flex md:hidden flex-col items-center text-center flex-1 justify-center gap-3 -mt-8 pb-[30vh]">
             <button
               aria-label="Auditions 2k26 - Apply Now"
               className="group flex flex-col items-center focus:outline-none cursor-pointer"
